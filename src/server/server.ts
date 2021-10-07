@@ -1,22 +1,50 @@
 
 import express from 'express';
 import cors from 'cors';
+import crypto from 'crypto';
 import path from 'path';
 import { PostModel } from './schemas/post.schema.js';
 import { UserModel } from './schemas/user.schema.js'
 import mongoose from 'mongoose';
+import multer from 'multer';
+import {GridFsStorage} from 'multer-gridfs-storage'
 
 const app = express();
-const __dirname = path.resolve();
 const PORT = 3501;
-
-mongoose.connect('mongodb://localhost:27017/test')
+let gfs;
+const mongoURI = 'mongodb://localhost:27017/test';
+mongoose.connect(mongoURI)
 .then(() => {
     console.log('Connected to DB Successfully');
+    gfs = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+        bucketName: "uploads"
+      });
 })
 .catch(err => console.log('Failed to Connect to DB', err))
+ 
+// Storage
+const storage = new GridFsStorage({
+    url: mongoURI,
+    file: (req, file) => {
+      return new Promise((resolve, reject) => {
+        crypto.randomBytes(16, (err, buf) => {
+          if (err) {
+            return reject(err);
+          }
+          const filename = buf.toString("hex") + path.extname(file.originalname);
+          const fileInfo = {
+            filename: new Date().toLocaleString() + file.originalname,
+            bucketName: "uploads"
+          };
+          resolve(fileInfo);
+        });
+      });
+    }
+  });
 
-
+  const upload = multer({
+    storage
+  });
 
 app.use(cors());
 app.use(express.json());
@@ -24,6 +52,12 @@ app.use(express.json());
 app.get('/', function(req, res) {
    res.json({message:'test'});
 });
+
+app.post("/upload", upload.single("file"), (req, res) => {
+    // res.json({file : req.file})
+    res.redirect("/");
+  });
+  
 
 app.get('/posts', function(req,res){
     PostModel.find()
