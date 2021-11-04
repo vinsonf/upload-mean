@@ -7,11 +7,12 @@ import { UserModel } from "./schemas/user.schema.js";
 import mongoose from "mongoose";
 import multer from "multer";
 import { GridFsStorage } from "multer-gridfs-storage";
+import { GridFSBucket } from "mongodb";
 
 const app = express();
 const PORT = 3501;
-let gfs;
-const mongoURI = "mongodb://localhost:27017/test";
+let gfs: GridFSBucket;
+const mongoURI = "mongodb://localhost:27017/test-fs";
 mongoose
   .connect(mongoURI)
   .then(() => {
@@ -56,6 +57,46 @@ app.get("/", function (req, res) {
 app.post("/upload", upload.single("file"), (req, res) => {
   // res.json({file : req.file})
   res.redirect("/");
+});
+
+app.get("/files", (req, res) => {
+  console.log('get files')
+  gfs.find().toArray((err, files) => {
+    // check if files
+    if (!files || files.length === 0) {
+      return res.status(404).json({
+        err: "no files exist"
+      });
+    }
+
+    return res.json(files);
+  });
+});
+
+app.get("/image/:filename", (req, res) => {
+  // console.log('id', req.params.id)
+  console.log('get image')
+  console.log(req.params.filename);
+  gfs
+    .find({
+      filename: req.params.filename
+    })
+    .toArray((err, files) => {
+      console.log(files);
+      if (!files || files.length === 0) {
+        return res.status(404).json({
+          err: "no files exist"
+        });
+      }
+      gfs.openDownloadStreamByName(req.params.filename).pipe(res);
+    });
+});
+
+app.post("/files/del/:id", (req, res) => {
+  gfs.delete(new mongoose.Types.ObjectId(req.params.id), (err, data) => {
+    if (err) return res.status(404).json({ err: err.message });
+    res.redirect("/");
+  });
 });
 
 app.get("/posts", function (req, res) {

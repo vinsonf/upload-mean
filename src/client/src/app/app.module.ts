@@ -14,13 +14,19 @@ import * as fromUser from './store/reducers/user/user.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { UserEffects } from './store/effects/user/user.effects';
 import { PageUsersComponent } from './pages/page-users/page-users.component';
+import { PageVideosComponent } from './pages/page-videos/page-videos.component';
+import { UploadVideosComponent } from './components/upload-videos/upload-videos.component';
+import { PageStreamVideoComponent } from './pages/page-stream-video/page-stream-video.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     UsersListComponent,
     UserInputComponent,
-    PageUsersComponent
+    PageUsersComponent,
+    PageVideosComponent,
+    UploadVideosComponent,
+    PageStreamVideoComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,16 @@
+<p>upload-files works!</p>
+<input type="file" class="custom-file-input" name="file" id="file1" (change)="readSingleFile($event)">
+						<label class="custom-file-label" for="file1" id="file-label">Choose file</label>
+            <button (click)="submit()">Upload</button>
+
+            <ul>
+              <li *ngFor="let file of files">
+
+
+                <a [href]="'http://localhost:3501/image/' +file.filename" [download]="file.filename" >{{file.filename}}</a>
+
+                <button (click)="stream(file.filename)" *ngIf="file.contentType.includes('video')">Stream</button>
+                <button (click)="delete(file._id)">Delete</button> <br>
+                <img *ngIf="file.contentType.includes('image')" [src]="'http://localhost:3501/image/' +file.filename" width="250" alt="" class="img-responsive">
+              </li>
+            </ul>

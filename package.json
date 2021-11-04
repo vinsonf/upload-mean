@@ -5,7 +5,8 @@
   "scripts": {
     "dev-server": "concurrently npm:dev-server:*",
     "dev-server:compile": "rm -rf ./dist/ &&tsc -w",
-    "dev-server:run": "nodemon"
+    "dev-server:run": "nodemon",
+    "client:run": "cd src/client/ && ng serve"
   },
   "nodemonConfig": {
     "restartable": "rs",

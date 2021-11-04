@@ -1,0 +1,7 @@
+<p>page-stream-video works!</p>
+{{filename}}
+<ng-container *ngIf="filename">
+  <video id="videoPlayer" width="650" controls muted="muted" autoplay>
+    <source [src]="'http://localhost:3501/image/' + filename" type="video/mp4" />
+  </video>
+</ng-container>
